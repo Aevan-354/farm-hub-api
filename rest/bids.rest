@@ -1,0 +1,18 @@
+### Bid Land
+
+POST http://localhost:5000/api/bids
+Content-Type: application/json
+
+{
+    "user_id": 1,
+    "land_id": 3,
+    "bid_price": 200000
+}
+
+### Get Land Bids
+GET http://localhost:5000/api/bids/land/3
+Content-Type: application/json
+
+### Get User Bids
+GET http://localhost:5000/api/bids/user/1
+Content-Type: application/json
