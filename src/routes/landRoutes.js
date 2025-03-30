@@ -37,7 +37,28 @@ router.post("/lands/market-place/:landId", async (req, res) => {
 // ✅ Fetch marketplace
 router.get("/lands/market-place", async (req, res) => {  // ✅ This now matches your frontend request
     try {
-        const availableLands = await pool.query("SELECT * FROM lands WHERE is_in_marketplace = true");
+        const query =`
+            SELECT 
+                bids.id AS bid_id,
+                bids.bid_price,
+                bids.user_id,
+                bids.status,
+                bids.won,
+                lands.id,
+                lands.title,
+                lands.location,
+                lands.price,
+                lands.size,
+                lands.description,
+                lands.image_url,
+                lands.created_at,
+                lands.available
+            FROM lands
+            LEFT JOIN bids ON lands.id = bids.land_id
+            WHERE is_in_marketplace = true
+            ORDER BY lands.created_at DESC
+        `;
+        const availableLands = await pool.query(query);
         res.status(200).json(availableLands.rows);
     } catch (err) {
         console.error("Error fetching lands:", err.message);
@@ -45,7 +66,6 @@ router.get("/lands/market-place", async (req, res) => {  // ✅ This now matches
     }
 });
 
-module.exports = router; // ✅ Only one module.exports
 // ✅ Fetch marketplace
 router.get("/lands", async (req, res) => {  // ✅ This now matches your frontend request
     try {
