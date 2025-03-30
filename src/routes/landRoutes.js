@@ -25,7 +25,8 @@ router.post("/lands", async (req, res) => {
 router.post("/lands/market-place/:landId", async (req, res) => {
     try {
         const landId =Number(req.params.landId)
-        await pool.query("UPDATE lands SET is_in_marketplace = true WHERE  id = $1", [landId]);
+        const {is_in_marketplace} =req.body
+        await pool.query("UPDATE lands SET is_in_marketplace = $1 WHERE  id = $2", [is_in_marketplace, landId]);
         res.status(200).json({message: 'Your land has been listed for bidding'});
     } catch (err) {
         console.error("Error fetching lands:", err.message);
