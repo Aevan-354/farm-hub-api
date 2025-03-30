@@ -6,9 +6,9 @@ const bcrypt = require("bcryptjs");
 // ✅ USER REGISTRATION ROUTE
 router.post("/register", async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, phone } = req.body;
 
-    if (!username || !email || !password) {
+    if (!username || !email || !password || !phone) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -24,8 +24,8 @@ router.post("/register", async (req, res) => {
 
     // ✅ Insert user into database
     const newUser = await pool.query(
-      "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email",
-      [username, email, hashedPassword]
+      "INSERT INTO users (username, email, password, phone) VALUES ($1, $2, $3, $4) RETURNING id, username, email",
+      [username, email, hashedPassword, phone]
     );
 
     res.status(201).json({ message: "User registered successfully", user: newUser.rows[0] });
@@ -63,7 +63,7 @@ router.post("/login", async (req, res) => {
     // ✅ Send success response (without password)
     res.status(200).json({
       message: "Login successful",
-      user: { id: user.id, email: user.email, username: user.username },
+      user: { id: user.id, email: user.email, username: user.username, created_at: user.created_at, profile_image: user.profile_image },
     });
 
   } catch (error) {
