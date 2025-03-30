@@ -7,11 +7,11 @@ router.post("/lands", async (req, res) => {
     console.log(req.body); // ✅ Ensure you can see the form data
     
     try {
-        const { title, description, location, price, size, owner_id, image_url } = req.body;
+        const { title, description, location, price, size, owner_id, image_url, soilType, roadAccess, waterAvailability, electricity, marketFacilities, internetAvailability } = req.body;
         
         const newLand = await pool.query(
-            "INSERT INTO lands (title, description, location, price, size, owner_id, image_url) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
-            [title, description, location, price, size, owner_id, image_url]
+            "INSERT INTO lands (title, description, location, price, size, owner_id, image_url, soilType, roadAccess, waterAvailability, electricity, marketFacilities, internetAvailability) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *",
+            [title, description, location, price, size, owner_id, image_url, soilType, roadAccess, waterAvailability, electricity, marketFacilities, internetAvailability]
         );
         
         res.status(201).json(newLand.rows[0]);
@@ -21,21 +21,34 @@ router.post("/lands", async (req, res) => {
     }
 });
 
-// ✅ Fetch All Lands (GET)
-router.get("/lands", async (req, res) => {  // ✅ This now matches your frontend request
+// ✅ Add land to marketplace
+router.post("/lands/market-place/:landId", async (req, res) => {
     try {
-        const allLands = await pool.query("SELECT * FROM lands");
-        res.status(200).json(allLands.rows);
+        const landId =Number(req.params.landId)
+        await pool.query("UPDATE lands SET is_in_marketplace = true WHERE  id = $1", [landId]);
+        res.status(200).json({message: 'Your land has been listed for bidding'});
     } catch (err) {
         console.error("Error fetching lands:", err.message);
         res.status(500).json({ error: "Server error" });
     }
 });
 
-// ✅ Fetch All availablq Lands (GET)
-router.get("/lands/available", async (req, res) => {  // ✅ This now matches your frontend request
+// ✅ Fetch marketplace
+router.get("/lands/market-place", async (req, res) => {  // ✅ This now matches your frontend request
     try {
-        const availableLands = await pool.query("SELECT * FROM lands inner join bids on lands.id =bids.land_id where available = true");
+        const availableLands = await pool.query("SELECT * FROM lands WHERE is_in_marketplace = true");
+        res.status(200).json(availableLands.rows);
+    } catch (err) {
+        console.error("Error fetching lands:", err.message);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+module.exports = router; // ✅ Only one module.exports
+// ✅ Fetch marketplace
+router.get("/lands", async (req, res) => {  // ✅ This now matches your frontend request
+    try {
+        const availableLands = await pool.query("SELECT * FROM lands");
         res.status(200).json(availableLands.rows);
     } catch (err) {
         console.error("Error fetching lands:", err.message);
