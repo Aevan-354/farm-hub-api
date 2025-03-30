@@ -5,10 +5,13 @@ CREATE TABLE IF NOT EXISTS public.users
 	id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     username character varying(255) COLLATE pg_catalog."default" NOT NULL,
     email character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    phone character varying(16) COLLATE pg_catalog."default" NOT NULL,
+    profile_image text COLLATE pg_catalog."default",
     password text COLLATE pg_catalog."default" NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT user_pkey PRIMARY KEY (id),
     CONSTRAINT users_email_key UNIQUE (email)
+    CONSTRAINT users_phone_key UNIQUE (phone)
 )
 
 TABLESPACE pg_default;
@@ -26,6 +29,12 @@ CREATE TABLE IF NOT EXISTS public.lands
     title character varying(255) COLLATE pg_catalog."default" NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
     location character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    soilType character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    roadAccess character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    waterAvailability character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    electricity character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    marketFacilities character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    internetAvailability character varying(255) COLLATE pg_catalog."default" NOT NULL,
     size numeric(10,2) NOT NULL,
     price numeric(10,2) NOT NULL,
     available boolean DEFAULT true,
@@ -47,7 +56,7 @@ ALTER TABLE IF EXISTS public.lands
 
 --- BIDS
 
-CREATE TABLE IF NOT EXISTS public.bid(
+CREATE TABLE IF NOT EXISTS public.bids(
     id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     bid_price numeric,
     status character varying COLLATE pg_catalog."default" DEFAULT 'open'::character varying,
@@ -98,4 +107,3 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.payments
     OWNER to postgres;
-
