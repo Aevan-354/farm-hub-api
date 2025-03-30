@@ -4,6 +4,7 @@ const pool = require("./db"); // Ensure PostgreSQL pool is correctly set up
 const authRoutes = require("./routes/authRoutes");
 const landRoutes = require("./routes/landRoutes"); // Ensure correct import
 const bidsRoutes = require("./routes/bidRoutes"); // Ensure correct import
+const profileRoute = require("./routes/profileRoute"); // Ensure correct import
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use((req, res, next) => {
 app.use("/api/auth", authRoutes);
 app.use("/api", landRoutes); // ✅ This ensures /api/lands works
 app.use("/api/bids", bidsRoutes);
+app.use("/api/profile", profileRoute);
 
 app.get("/", (req, res) => {
   res.send("API is running...");
