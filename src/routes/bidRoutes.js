@@ -20,6 +20,40 @@ router.post("/", async (req, res) => {
     }
 });
 
+router.put("/:id", async (req, res) => {
+    try {
+      const bidId =req.params.id
+      const {bidder_id, status, won, bid_price} =req.body
+
+      const bidFound = (await pool.query("SELECT * FROM bids WHERE id = $1", [bidId])).rows.at(0);
+      if (!bidFound) {
+          return res.status(404).json({ message: "Bid not found" });
+      }
+  
+      if(bidder_id){
+          await pool.query('UPDATE bids SET password = $1 WHERE id = $2', [hashedPassword, userId])
+      }
+  
+      if(profile_image){
+          await pool.query('UPDATE users SET profile_image = $1 WHERE id = $2', [profile_image, userId])
+      }
+  
+      const profile_pic =profile_image ?? userFound.profile_image
+      delete userFound.password
+      res.status(200).json({
+        message: `${newPassword && !profile_image? 'Password updated successfully': !newPassword && profile_image? 'Profile Picture updated': 'Details updated successfully' }`,
+        user: {
+          ...userFound,
+          profile_image: profile_pic
+        }
+      });
+  
+    } catch (error) {
+      console.error("Login Error:", error);
+      res.status(500).json({ message: "Server Error" });
+    }
+  });
+
 // ✅ Fetch User Bids Lands (GET)
 router.get("/user/:user_id", async (req, res) => {
     const userId = req.params.user_id;
@@ -68,9 +102,26 @@ router.get("/user/:user_id", async (req, res) => {
     }
 });
 
-router.get("/land/:land_id", async (req, res) => {  // ✅ This now matches your frontend request
+router.get("/land/:land_id", async (req, res) => {
   try {
-      const bids = await pool.query("SELECT * FROM bids inner join lands on lands.id =land_id where land_id = $1", [req.params.land_id]);
+    const query = `
+            SELECT 
+                bids.id AS bid_id,
+                bids.bid_price,
+                users.username,
+                users.id as bidder_id,
+                lands.id,
+                lands.title,
+                lands.location,
+                lands.image_url,
+                lands.created_at
+            FROM bids
+            INNER JOIN lands ON lands.id = bids.land_id
+            INNER JOIN users ON bids.user_id = users.id
+            WHERE lands.id = $1
+            ORDER BY lands.created_at DESC
+        `;
+      const bids = await pool.query(query, [req.params.land_id]);
       return res.status(200).json(bids.rows);
   } catch ({message}) {
       return res.status(500).json({ message});
