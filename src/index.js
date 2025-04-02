@@ -5,6 +5,7 @@ const authRoutes = require("./routes/authRoutes");
 const landRoutes = require("./routes/landRoutes"); // Ensure correct import
 const bidsRoutes = require("./routes/bidRoutes"); // Ensure correct import
 const profileRoute = require("./routes/profileRoute"); // Ensure correct import
+const paymentsRoute = require("./routes/paymentRoutes"); 
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api", landRoutes); // ✅ This ensures /api/lands works
 app.use("/api/bids", bidsRoutes);
 app.use("/api/profile", profileRoute);
+app.use("/api/payments", paymentsRoute);
 
 app.get("/", (req, res) => {
   res.send("API is running...");

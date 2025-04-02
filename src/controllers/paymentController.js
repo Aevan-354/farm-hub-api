@@ -109,4 +109,8 @@ const handleMpesaCallback = async (req, res) => {
   }
 };
 
+const myTransactions =async (req, res) =>{
+
+}
+
 module.exports = { initiateMpesaPayment, handleMpesaCallback };
