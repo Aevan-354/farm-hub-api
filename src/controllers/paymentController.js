@@ -110,7 +110,28 @@ const handleMpesaCallback = async (req, res) => {
 };
 
 const myTransactions =async (req, res) =>{
+  const user_id =req.params.id
 
+  const query = `
+            SELECT 
+                payments.id AS p_id,
+                payments.amount as p_amount,
+                payments.status as p_status,
+                payments.created_at as p_created_at,
+                users.created_at as p_created_at
+                lands.id,
+                lands.title,
+                lands.location,
+                lands.price,
+                lands.size,
+                lands.description,
+                lands.image_url,
+                lands.created_at,
+                lands.available
+            FROM bids
+            INNER JOIN lands ON lands.id = bids.land_id
+            WHERE bids.user_id = $1
+            ORDER BY lands.created_at DESC`
 }
 
 module.exports = { initiateMpesaPayment, handleMpesaCallback };
