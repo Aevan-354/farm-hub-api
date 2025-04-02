@@ -23,29 +23,26 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
     try {
       const bidId =req.params.id
-      const {bidder_id, status, won, bid_price} =req.body
+      const { status, won, land_id } =req.body
 
       const bidFound = (await pool.query("SELECT * FROM bids WHERE id = $1", [bidId])).rows.at(0);
       if (!bidFound) {
           return res.status(404).json({ message: "Bid not found" });
       }
   
-      if(bidder_id){
-          await pool.query('UPDATE bids SET password = $1 WHERE id = $2', [hashedPassword, userId])
+      if(status){
+          await pool.query('UPDATE bids SET status = $1 WHERE id = $2', [status, bidId])
       }
+
+      if(won){
+          await pool.query("UPDATE bids SET status = 'closed', won = true WHERE id = $1", [bidId])
+          await pool.query('UPDATE lands SET available = false WHERE id = $1', [land_id])
+    }
   
-      if(profile_image){
-          await pool.query('UPDATE users SET profile_image = $1 WHERE id = $2', [profile_image, userId])
-      }
-  
-      const profile_pic =profile_image ?? userFound.profile_image
-      delete userFound.password
       res.status(200).json({
-        message: `${newPassword && !profile_image? 'Password updated successfully': !newPassword && profile_image? 'Profile Picture updated': 'Details updated successfully' }`,
-        user: {
-          ...userFound,
-          profile_image: profile_pic
-        }
+        message: won
+            ? 'Bid winner was selected. Bid closed'
+            : 'Bid details updated successfully'
       });
   
     } catch (error) {
